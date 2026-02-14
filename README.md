@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>San Valentín para Camila</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <style>
+    :root{--pink:#ff69b4;--deep:#d6336c}
+    html,body{height:100%;margin:0;font-family:Segoe UI, system-ui, -apple-system, 'Helvetica Neue', Arial}
+    body{background:linear-gradient(to top,#ffb6c1,#fff);overflow:hidden}
+    #heartParticles{position:fixed;inset:0;pointer-events:none;z-index:1}
+    .center-heart{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:6;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .heart-svg{filter:drop-shadow(0 8px 20px rgba(214,72,121,0.12));transition:transform .18s ease}
+    /* heartbeat animation: scale + subtle shadow pulse */
+    .center-heart.pulse .heart-svg{animation:heartbeat 1.1s ease-in-out infinite}
+    @keyframes heartbeat{0%{transform:scale(.96)}25%{transform:scale(1.12)}40%{transform:scale(1)}60%{transform:scale(1.06)}100%{transform:scale(.96)}}
+    .video-modal{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.98);z-index:10;align-items:center;justify-content:center}
+    .video-content{background:#fff;border-radius:16px;box-shadow:0 8px 40px rgba(215,30,80,0.12);padding:18px;max-width:880px;width:92%;display:flex;flex-direction:column;align-items:center}
+    .dialog{display:none;width:100%;max-width:560px;margin-top:12px;text-align:center}
+    .dialog p{color:var(--deep);font-size:1.15rem}
+    .dialog button{margin-top:12px;padding:10px 22px;border-radius:12px;border:none;background:var(--pink);color:#fff;font-size:1rem;cursor:pointer}
+    .dialog.show{display:block}
+    #tablaPersonajes .personaje{width:90px;border-radius:12px;cursor:pointer;box-shadow:0 6px 18px rgba(231,84,128,0.12)}
+    #impostorOpciones .impostor-btn{padding:8px 10px;border-radius:10px;border:none;background:#ffd6e6;color:var(--deep);cursor:pointer}
+    #chocolatReveal{display:none;position:relative;height:140px;margin-top:8px}
+    #chocolatImg{position:absolute;left:-320px;top:0;width:160px;height:auto;border-radius:12px;box-shadow:0 6px 20px rgba(231,84,128,0.12);transition:left 1.2s cubic-bezier(.68,-0.55,.27,1.55),opacity .6s}
+
+    /* Flores overlay and surrounding gifs */
+    #floresOverlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.96);z-index:120;flex-direction:column;align-items:center;justify-content:center;padding:18px;opacity:0;transition:opacity .6s ease}
+    #floresOverlay .overlay-title{font-family:Pacifico, cursive;color:var(--deep);font-size:2rem;margin-bottom:14px}
+    .flores-inner{position:relative;width:76vw;max-width:980px;height:68vh;max-height:680px;display:block}
+    /* center the main flores image absolutely inside the container */
+    #floresImgLarge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.92);max-width:52%;max-height:64%;border-radius:12px;box-shadow:0 12px 40px rgba(215,30,80,0.18);opacity:0;transition:transform .45s ease,opacity .45s ease}
+    .around-img{position:absolute;width:130px;height:auto;opacity:0;transform:scale(.85);transition:transform .45s ease,opacity .45s ease;background:transparent;border-radius:10px}
+    .pos1{left:50%;top:6%;transform:translate(-50%,-50%)}.pos2{left:84%;top:18%;transform:translate(-50%,-50%)}.pos3{left:94%;top:50%;transform:translate(-50%,-50%)}.pos4{left:84%;top:82%;transform:translate(-50%,-50%)}.pos5{left:50%;top:96%;transform:translate(-50%,-50%)}.pos6{left:16%;top:82%;transform:translate(-50%,-50%)}.pos7{left:6%;top:50%;transform:translate(-50%,-50%)}.pos8{left:16%;top:18%;transform:translate(-50%,-50%)}
+
+    /* responsive tweaks */
+    @media(max-width:720px){#floresImgLarge{max-width:64%}.around-img{width:96px}}
+  </style>
+</head>
+<body>
+  <canvas id="heartParticles"></canvas>
+
+  <div class="center-heart" id="mainHeart" role="button" aria-label="Abrir sorpresa" title="Haz click">
+    <img id="startGif" src="cora.png" alt="corazon latiendo" style="width:160px;height:160px;object-fit:contain;cursor:pointer;border-radius:12px;filter:drop-shadow(0 10px 24px rgba(214,72,121,0.12));" />
+  </div>
+
+  <div class="video-modal" id="videoModal">
+    <div class="video-content" role="dialog" aria-modal="true">
+      <img id="pusheenGif" src="Pusheen.vid.gif" alt="Pusheen animado" data-duration="4200" style="display:none;width:640px;max-width:92%;border-radius:12px;transition:opacity .8s;" />
+
+      <div id="dialog1" class="dialog">
+        <p>Me ayudas en algo? :c</p>
+        <button id="btnNhueno">ñueno</button>
+      </div>
+
+      <div id="dialog2" class="dialog">
+        <p>Alguien ha robado tus flores y chocolates :c, y quiero que me ayudes a encontrar al impostor</p>
+        <button id="btnNhuenito">ñuenito</button>
+      </div>
+
+      <div id="tablaPersonajes" class="dialog">
+        <p>¿Quién crees que es el impostor?</p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;justify-items:center;margin:12px 0">
+          <img src="gnomo.gif" class="personaje" data-personaje="gnomo" alt="gnomo"/>
+          <img src="zorro.gif" class="personaje" data-personaje="zorro" alt="zorro"/>
+          <img src="honguito.gif" class="personaje" data-personaje="honguito" alt="honguito"/>
+          <img src="sapito.gif" class="personaje" data-personaje="sapito" alt="sapito"/>
+          <img src="raccoon.gif" class="personaje" data-personaje="raccoon" alt="raccoon"/>
+          <img src="hada.gif" class="personaje" data-personaje="hada" alt="hada"/>
+          <img src="ardilla.gif" class="personaje" data-personaje="ardilla" alt="ardilla"/>
+          <img src="buho.gif" class="personaje" data-personaje="buho" alt="buho"/>
+        </div>
+        <div id="dialogoPersonaje" style="min-height:44px;color:var(--deep)"></div>
+        <button id="btnElegirImpostor">Elegir al impostor</button>
+      </div>
+
+      <div id="impostorOpciones" class="dialog">
+        <p>¿Quién es el impostor?</p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0;justify-items:center">
+          <button class="impostor-btn">Pusheegnomo</button>
+          <button class="impostor-btn">Pusheezorro</button>
+          <button class="impostor-btn">Pusheehonguito</button>
+          <button class="impostor-btn">Pusheesapito</button>
+          <button class="impostor-btn">Pusheemapache</button>
+          <button class="impostor-btn">Pusheehada</button>
+          <button class="impostor-btn">Pusheeardilla</button>
+          <button class="impostor-btn">Pusheebuho</button>
+        </div>
+        <button id="btnRegresar">Regresar</button>
+        <div id="chocolatReveal">
+          <img id="chocolatImg" src="chocolat.png" alt="chocolate" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Flores overlay (static) -->
+  <div id="floresOverlay">
+    <div class="overlay-title">¿Quieres ser mi sanvalentin por segunda vez? :3</div>
+    <div class="flores-inner">
+      <img id="floresImgLarge" src="flores.png" alt="flores" />
+      <img class="around-img pos1" src="1.gif" alt="1" />
+      <img class="around-img pos2" src="2.gif" alt="2" />
+      <img class="around-img pos3" src="3.gif" alt="3" />
+      <img class="around-img pos4" src="4.gif" alt="4" />
+      <img class="around-img pos5" src="5.gif" alt="5" />
+      <img class="around-img pos6" src="6.gif" alt="6" />
+      <img class="around-img pos7" src="7.gif" alt="7" />
+      <img class="around-img pos8" src="8.gif" alt="8" />
+    </div>
+  </div>
+
+  <script>
+    // Particles canvas
+    const canvas = document.getElementById('heartParticles');
+    const ctx = canvas.getContext('2d');
+    let hearts = [];
+    function resizeCanvas(){canvas.width = innerWidth; canvas.height = innerHeight}
+    addEventListener('resize', resizeCanvas); resizeCanvas();
+    function randomHeart(){return{ x:Math.random()*canvas.width, y:canvas.height+Math.random()*120, size:12+Math.random()*28, speed:1+Math.random()*2.2, drift:(Math.random()-0.5)*1.6, alpha:0.6+Math.random()*0.4, color:['#ff69b4','#d6336c','#fff0f6'][Math.floor(Math.random()*3)] }}
+    for(let i=0;i<72;i++) hearts.push(randomHeart());
+    function drawHeart(h){ctx.save();ctx.globalAlpha=h.alpha;ctx.translate(h.x,h.y);ctx.rotate(Math.sin(h.y/40)*0.18);ctx.beginPath();ctx.moveTo(0,h.size/4);ctx.bezierCurveTo(h.size/2,-h.size/2,h.size,h.size/3,0,h.size);ctx.bezierCurveTo(-h.size,h.size/3,-h.size/2,-h.size/2,0,h.size/4);ctx.fillStyle=h.color;ctx.fill();ctx.restore()}
+    function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);for(const h of hearts){h.y-=h.speed;h.x+=h.drift; if(h.y<-60||h.x<-60||h.x>canvas.width+60) Object.assign(h, randomHeart()), h.y = canvas.height+20; drawHeart(h)} requestAnimationFrame(animate)}
+    animate();
+
+    // Elements
+    const mainHeart = document.getElementById('mainHeart');
+    const videoModal = document.getElementById('videoModal');
+    const pusheenGif = document.getElementById('pusheenGif');
+    const dialog1 = document.getElementById('dialog1');
+    const dialog2 = document.getElementById('dialog2');
+    const tablaPersonajes = document.getElementById('tablaPersonajes');
+    const dialogoPersonaje = document.getElementById('dialogoPersonaje');
+    const btnElegirImpostor = document.getElementById('btnElegirImpostor');
+    const impostorOpciones = document.getElementById('impostorOpciones');
+    const btnRegresar = document.getElementById('btnRegresar');
+    const chocolatReveal = document.getElementById('chocolatReveal');
+    const chocolatImg = document.getElementById('chocolatImg');
+    const floresOverlay = document.getElementById('floresOverlay');
+    const floresImgLarge = document.getElementById('floresImgLarge');
+
+    // Open modal sequence
+    let pusheenTimer = null;
+    let finalFadeTimer = null;
+    function schedulePusheenFade(){
+      // duration in ms stored on the image as data-duration
+      const dur = parseInt(pusheenGif.dataset.duration, 10) || 4000;
+      if(pusheenTimer) clearTimeout(pusheenTimer);
+      // ensure dialog1 is hidden until after fade
+      dialog1.classList.remove('show');
+      pusheenTimer = setTimeout(()=>{
+        // fade out the gif
+        try{ pusheenGif.style.opacity = '0'; }catch(e){}
+        setTimeout(()=>{
+          if(pusheenGif) pusheenGif.style.display = 'none';
+          pusheenTimer = null;
+          // only show the dialog if the modal is still open
+          if (videoModal.style.display !== 'none') {
+            dialog1.classList.add('show');
+          }
+        }, 850);
+      }, dur);
+    }
+
+    mainHeart.addEventListener('click', ()=>{
+      mainHeart.style.display='none';
+      videoModal.style.display='flex';
+      pusheenGif.style.display='block';
+      // make visible and schedule fade when animation is expected to finish
+      requestAnimationFrame(()=>{ pusheenGif.style.opacity = '1'; });
+      schedulePusheenFade();
+      // the first dialog will appear after the GIF fades (scheduled)
+      schedulePusheenFade();
+    });
+
+    // close modal by clicking outside
+    videoModal.addEventListener('click', e=>{ if(e.target===videoModal){ videoModal.style.display='none'; pusheenGif.style.display='none'; mainHeart.style.display='block'; dialog1.classList.remove('show'); dialog2.classList.remove('show'); tablaPersonajes.classList.remove('show'); impostorOpciones.classList.remove('show'); if(pusheenTimer) { clearTimeout(pusheenTimer); pusheenTimer = null; } } });
+
+    document.getElementById('btnNhueno').addEventListener('click', ()=>{ dialog1.classList.remove('show'); dialog2.classList.add('show'); });
+    document.getElementById('btnNhuenito').addEventListener('click', ()=>{ dialog2.classList.remove('show'); tablaPersonajes.classList.add('show'); });
+
+    const mensajesPersonaje = { gnomo:'— ¿Alguien ha visto las flores que estaban en la mesa?', zorro:'— También desaparecieron los chocolates…', honguito:'— Yo estaba en el jardín toda la tarde.', sapito:'— ¡Qué misterio!', raccoon:'— Yo estuve durmiendo la siesta.', hada:'— Yo ayudé a decorar antes de que todo desapareciera.', ardilla:'— El chocolate estaba un poco derretido…', buho:'— Deberíamos buscar pistas.' };
+    document.querySelectorAll('.personaje').forEach(img=>img.addEventListener('click', ()=>{ dialogoPersonaje.textContent = mensajesPersonaje[img.dataset.personaje] || '' }));
+
+    btnElegirImpostor.addEventListener('click', ()=>{ tablaPersonajes.classList.remove('show'); impostorOpciones.classList.add('show'); chocolatReveal.style.display='none'; chocolatImg.style.left='-320px'; });
+
+    // impostor button handlers
+    const impostorMessages = {
+      Pusheegnomo: '— ¿Yo? ¡Pero fui quien preguntó por las flores de la mesa!',
+      Pusheezorro: '— ¡Solo dije que tenía ganas de probar un chocolate!',
+      Pusheehonguito: '— Pero si yo estuve regando las plantas toda la tarde.',
+      Pusheemapache: '— No puedo robar flores mientras duermo.',
+      Pusheehada: '— Yo ayudé a decorar antes de que todo desapareciera.',
+      Pusheebuho: '— Fui quien propuso buscar pistas.',
+      Pusheesapito: '— Amar las sorpresas no me convierte en ladrón.'
+    };
+
+    Array.from(document.querySelectorAll('.impostor-btn')).forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const key = btn.textContent.trim();
+
+        // if correct choice, schedule final fade in 4s (from click)
+        if(key === 'Pusheeardilla'){
+          // clear any previously scheduled fades
+          if (finalFadeTimer) { clearTimeout(finalFadeTimer); finalFadeTimer = null; }
+
+          // show chocolat animation immediately
+          chocolatReveal.style.display='block';
+          chocolatImg.style.opacity='1';
+          chocolatImg.style.left='-320px';
+          // start the sliding in animation quickly
+          setTimeout(()=> chocolatImg.style.left='0px', 60);
+
+          // Keep the modal fully visible for 4 seconds, then fade it out quickly and show overlay
+          finalFadeTimer = setTimeout(()=>{
+            // fade modal out quickly
+            videoModal.style.transition = 'opacity .8s ease';
+            videoModal.style.opacity = '0';
+            // after fade completes, hide modal and show overlay
+            setTimeout(()=>{
+              videoModal.style.display = 'none';
+              videoModal.style.opacity = '1'; // reset
+              // show overlay with fade-in
+              floresOverlay.style.display = 'flex';
+              floresOverlay.style.opacity = '0';
+              // ensure main image starts slightly smaller and invisible
+              floresImgLarge.style.transform = 'translate(-50%,-50%) scale(.92)'; floresImgLarge.style.opacity = '0';
+              // force a repaint then animate overlay and inner image
+              requestAnimationFrame(()=>{
+                floresOverlay.style.opacity = '1';
+                // after overlay visible, pop the main image
+                setTimeout(()=>{
+                  floresImgLarge.style.transform = 'translate(-50%,-50%) scale(1)'; floresImgLarge.style.opacity = '1';
+                  document.querySelectorAll('.around-img').forEach((a,i)=>{ a.style.opacity='1'; a.style.transform='scale(1)'; a.style.transitionDelay = (i*60)+'ms'; });
+                }, 120);
+              });
+              // lock the overlay for 4 seconds so the scene remains
+              window.__overlayLocked = true;
+              if(window.__overlayLockTimer) clearTimeout(window.__overlayLockTimer);
+              window.__overlayLockTimer = setTimeout(()=>{ window.__overlayLocked = false; window.__overlayLockTimer = null; }, 4000);
+              finalFadeTimer = null;
+            }, 850);
+          }, 4000);
+        } else {
+          // other choices: show a dialog message mapped to the button
+          chocolatReveal.style.display='none'; chocolatImg.style.left='-320px';
+          let resultDiv = document.getElementById('impostorResult');
+          if(!resultDiv){ resultDiv = document.createElement('div'); resultDiv.id = 'impostorResult'; resultDiv.style.marginTop = '12px'; resultDiv.style.color = 'var(--deep)'; resultDiv.style.fontSize = '1rem'; resultDiv.style.minHeight = '36px'; resultDiv.style.opacity = '0'; impostorOpciones.appendChild(resultDiv); }
+          resultDiv.textContent = impostorMessages[key] || '';
+          resultDiv.style.transition = 'opacity .3s'; resultDiv.style.opacity = '1';
+          // auto-hide after 2.5s
+          setTimeout(()=>{ if(resultDiv) resultDiv.style.opacity = '0'; }, 2500);
+        }
+      });
+    });
+
+    btnRegresar.addEventListener('click', ()=>{ impostorOpciones.classList.remove('show'); tablaPersonajes.classList.add('show'); chocolatReveal.style.display='none'; chocolatImg.style.left='-320px'; });
+
+    // allow closing the overlay by clicking on it (or you can add a close button)
+    floresOverlay.addEventListener('click', e=>{ if(e.target === floresOverlay){
+        // ignore clicks while overlay is locked to enforce the 4s scene
+        if(window.__overlayLocked) return;
+        // animate hide: fade overlay out and then hide
+        floresOverlay.style.opacity = '0';
+        floresImgLarge.style.opacity = '0';
+        document.querySelectorAll('.around-img').forEach(a=>{a.style.opacity='0';a.style.transform='scale(.85)'});
+        setTimeout(()=>{ floresOverlay.style.display='none'; mainHeart.style.display='block'; if(finalFadeTimer){ clearTimeout(finalFadeTimer); finalFadeTimer = null; } }, 420);
+      } });
+
+    // clear final fade if modal closed earlier
+    videoModal.addEventListener('click', e=>{ if(e.target===videoModal){ if(finalFadeTimer){ clearTimeout(finalFadeTimer); finalFadeTimer = null; } } });
+  </script>
+</body>
+</html>
