@@ -1,216 +1,339 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>San Valentín para Camila</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>miamorsito camila</title>
   <style>
     body {
+      font-family: 'Arial', sans-serif;
       margin: 0;
       padding: 0;
-      background: linear-gradient(to top, #ffb6c1, #fff);
-      overflow: hidden;
-      font-family: 'Segoe UI', sans-serif;
+      background-color: rgb(194, 197, 197); 
+      overflow-x: hidden;
     }
-    #heartParticles {
+    .hearts {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       pointer-events: none;
       z-index: 1;
     }
-    .center-heart {
+    .heart {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 2;
-      cursor: pointer;
-      animation: heartbeat 1s infinite;
+      animation: fall linear forwards;
+      color: rgba(255,0,0,0.6);
     }
-    @keyframes heartbeat {
-      0%, 100% { transform: translate(-50%, -50%) scale(1); }
-      10% { transform: translate(-50%, -50%) scale(1.1); }
-      20% { transform: translate(-50%, -50%) scale(1.2); }
-      30% { transform: translate(-50%, -50%) scale(1.1); }
-      40% { transform: translate(-50%, -50%) scale(1); }
+    @keyframes fall {
+      to {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
     }
-    .dialog {
+    .screen {
       display: none;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #fff;
-      border-radius: 20px;
-      box-shadow: 0 4px 24px rgba(255, 105, 180, 0.2);
-      padding: 32px 24px;
-      z-index: 3;
-      text-align: center;
-    }
-    .dialog.show {
-      display: block;
-      animation: fadeIn 0.5s;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    .dialog button {
-      margin: 16px 12px 0 12px;
-      padding: 12px 32px;
-      border: none;
-      border-radius: 12px;
-      background: #ff69b4;
-      color: #fff;
-      font-size: 1.2em;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .dialog button:hover {
-      background: #e75480;
-    }
-    .video-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(255,255,255,0.98);
-      z-index: 10;
+      justify-content: center;
       align-items: center;
+      height: 100vh;
+      text-align: center;
+      flex-direction: column;
+      position: relative;
+      z-index: 2;
+    }
+    .active {
+      display: flex;
+    }
+    .password-screen {
+      flex-direction: column;
+    }
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 60px);
+      gap: 10px;
+      margin-top: 20px;
       justify-content: center;
     }
-    .video-content {
-      background: #fff;
+    .key {
+      background-color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 20px;
+      padding: 15px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 4px 4px 8px rgba(0,0,0,0.15);
+    }
+    .key:hover {
+      background-color: #e6f0f5;
+      transform: translateY(-3px);
+    }
+    .input-display {
+      font-size: 24px;
+      margin-top: 20px;
+      letter-spacing: 8px;
+    }
+    .notepad {
+      background-color: #f9f9f9;
+      border: 3px solid #000000;
+      padding: 20px;
       border-radius: 20px;
-      box-shadow: 0 4px 24px rgba(255, 105, 180, 0.2);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      width: 90%;
+      max-width: 500px;
+      text-align: left;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      line-height: 1.6;
+      box-shadow: 8px 8px 15px rgba(0,0,0,0.2);
+    }
+    .notepad h3 {
+      margin-top: 0;
+    }
+    .password-img {
+      width: 100%;
+      max-width: 320px;
+      height: auto;
+      object-fit: contain;
+      border-radius: 15px;
+      box-shadow: 6px 6px 15px rgba(0,0,0,0.3);
+      margin-bottom: 20px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .note-img {
+      width: 100%;
+      max-width: 450px;
+      height: auto;
+      border-radius: 15px;
+      margin-bottom: 15px;
+      box-shadow: 4px 4px 12px rgba(0,0,0,0.2);
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    @media (max-width: 600px) {
+      .password-img, .note-img {
+        max-width: 98vw;
+      }
+      .notepad {
+        padding: 8px;
+      }
+    }
+    .back-btn {
+      display: inline-block;
+      margin-top: 15px;
+      background-color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 4px 4px 8px rgba(0,0,0,0.15);
+      transition: all 0.2s ease;
+    }
+    .back-btn:hover {
+      background-color: #ded8d8;
+      transform: translateY(-2px);
     }
   </style>
 </head>
 <body>
-  <canvas id="heartParticles"></canvas>
-  <div class="center-heart" id="mainHeart">
-    <svg width="120" height="120" viewBox="0 0 120 120">
-      <path d="M60 100 Q20 60 60 20 Q100 60 60 100" fill="#ff69b4" stroke="#d6336c" stroke-width="4"/>
-    </svg>
+<div class="hearts"></div>
+<div id="passwordScreen" class="screen password-screen active">
+<img src="https://cdn.discordapp.com/attachments/1143634407723376732/1467749243363131681/IMG_9592.png?ex=69818381&is=69803201&hm=fc0a1675d0cfb388e141f8dbc757b1cf75ff934fc4b3c997fa6f78ea0a996059&" 
+     alt="Imagen decorativa" 
+     class="password-img" 
+     style="width: 300px; height: auto;">
+  <h2>🔒 Ingresa la contraseña</h2>
+  <div class="input-display" id="inputDisplay">••••</div>
+  <div class="keypad">
+    <button class="key" onclick="enterDigit('1')">1</button>
+    <button class="key" onclick="enterDigit('2')">2</button>
+    <button class="key" onclick="enterDigit('3')">3</button>
+    <button class="key" onclick="enterDigit('4')">4</button>
+    <button class="key" onclick="enterDigit('5')">5</button>
+    <button class="key" onclick="enterDigit('6')">6</button>
+    <button class="key" onclick="enterDigit('7')">7</button>
+    <button class="key" onclick="enterDigit('8')">8</button>
+    <button class="key" onclick="enterDigit('9')">9</button>
+    <button class="key" onclick="checkPassword()">✔</button>
+    <button class="key" onclick="enterDigit('0')">0</button>
+    <button class="key" onclick="deleteLast()">⌫</button>
   </div>
-  <div class="video-modal" id="videoModal">
-    <div class="video-content">
-      <img id="pusheenGif" src="Pusheen.vid.gif" alt="Pusheen animado" width="560" height="315" style="display:none; border-radius:16px; box-shadow:0 4px 24px rgba(255, 105, 180, 0.2); background:#fff;" />
-      <div id="dialog1" class="dialog" style="display:none;">
-        <p style="font-size:1.3em; color:#d6336c;">Me ayudas en algo? :c</p>
-        <button id="btnNhueno">ñueno</button>
+</div>
+<div id="notepadScreen" class="screen">
+  <div class="notepad" style="text-align: center;">
+    <img src="https://cdn.custom-cursor.com/packs/10587/pusheen-valentines-day-pack.png" 
+         alt="Imagen decorativa" 
+         class="password-img"
+         style="max-width: 100%; height: auto;">
+    <h3 style="text-align: left; margin-bottom: 0;">📅 02 Febrero 2026</h3>
+    <h4 style="text-align: left; margin-top: 0;">💌 Mi Hermosha Camila</h4>
+    <div id="mainLetter" style="text-align: justify; min-height: 180px; font-size: 1.08em;"></div>
+    <div id="heartsContainer" style="position: relative; width: 100%; min-height: 80px; margin-top: 18px;"></div>
+    <div style="display: flex; flex-direction: row; align-items: flex-end; justify-content: space-between; width: 100%; margin-top: 24px;">
+      <div style="flex: 0 0 auto;">
+        <button id="surpriseBtn" style="background: #ffeb3b; color: #222; border: none; border-radius: 50%; width: 54px; height: 54px; font-size: 2rem; font-weight: bold; box-shadow: 0 2px 8px #fbb6ce; cursor: pointer; transition: background 0.2s;">?</button>
+        <div id="surpriseMsg" style="display:none; margin-top: 8px; background: #fffbe7; color: #c2185b; border-radius: 12px; box-shadow: 0 2px 8px #fbb6ce; padding: 18px 24px; font-family: 'Comic Sans MS', cursive, sans-serif; font-size: 18px; min-width: 220px; text-align: center;"></div>
       </div>
-      <div id="dialog2" class="dialog" style="display:none;">
-        <p style="font-size:1.2em; color:#d6336c;">Alguien ha robado tus flores y chocolates :c, y quiero que me ayudes a encontrar al impostor</p>
-        <button id="btnNhuenito">ñuenito</button>
-      </div>
-      <div id="tablaPersonajes" class="dialog" style="display:none; padding:16px 8px;">
-        <p style="font-size:1.2em; color:#d6336c;">¿Quién crees que es el impostor?</p>
-        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:18px; justify-items:center; margin-bottom:18px;">
-          <img src="gnomo.gif" alt="gnomo" class="personaje" data-personaje="gnomo" style="width:90px; cursor:pointer; border-radius:12px; box-shadow:0 2px 8px #e75480;" />
-          <img src="zorro.gif" alt="zorro" class="personaje" data-personaje="zorro" style="width:90px; cursor:pointer; border-radius:12px; box-shadow:0 2px 8px #e75480;" />
-          <img src="honguito.gif" alt="honguito" class="personaje" data-personaje="honguito" style="width:90px; cursor:pointer; border-radius:12px; box-shadow:0 2px 8px #e75480;" />
-          <img src="sapito.gif" alt="sapito" class="personaje" data-personaje="sapito" style="width:90px; cursor:pointer; border-radius:12px; box-shadow:0 2px 8px #e75480;" />
-          <img src="raccoon.gif" alt="raccoon" class="personaje" data-personaje="raccoon" style="width:90px; cursor:pointer; border-radius:12px; box-shadow:0 2px 8px #e75480;" />
-          <img src="hada.gif" alt="hada" class="personaje" data-personaje="hada" style="width:90px; cursor:pointer; border-radius:12px; box-shadow:0 2px 8px #e75480;" />
-          <img src="ardilla.gif" alt="ardilla" class="personaje" data-personaje="ardilla" style="width:90px; cursor:pointer; border-radius:12px; box-shadow:0 2px 8px #e75480;" />
-          <img src="buho.gif" alt="buho" class="personaje" data-personaje="buho" style="width:90px; cursor:pointer; border-radius:12px; box-shadow:0 2px 8px #e75480;" />
+      <div style="flex: 1 1 auto; display: flex; justify-content: flex-end; gap: 12px;">
+        <button class="back-btn" onclick="goBack()">🔙 Inicio</button>
+        <div id="playlistBtnContainer" style="position: relative; min-height: 60px;">
+          <button id="showPlaylistBtn" style="padding: 12px 18px; font-size: 16px; border-radius: 50px; background: #1db954; color: white; border: none; cursor: pointer; box-shadow: 0 2px 8px #b2fbb6; z-index: 10;">🎵 Playlist romántica</button>
+          <div id="playlistEmbed" style="display: none; position: absolute; bottom: 60px; right: 0; z-index: 20;">
+            <iframe width="220" height="40" scrolling="no" frameborder="no" allow="autoplay"
+              src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/claudioconstantini/cherry-blossoms&color=%23ff5500&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false">
+            </iframe>
+          </div>
         </div>
-        <div id="dialogoPersonaje" style="min-height:40px; margin-bottom:18px; color:#d6336c; font-size:1.1em; max-width:320px; white-space:pre-line; overflow-wrap:break-word; text-align:center; line-height:1.2; min-height:2.4em;"></div>
-        <button id="btnElegirImpostor">Elegir al impostor</button>
-      </div>
-      <div id="impostorOpciones" class="dialog" style="display:none;">
-        <p style="font-size:1.2em; color:#d6336c;">¿Quién es el impostor?</p>
-        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; justify-items:center; margin-bottom:18px;">
-          <button class="impostor-btn">Pusheegnomo</button>
-          <button class="impostor-btn">Pusheezorro</button>
-          <button class="impostor-btn">Pusheehonguito</button>
-          <button class="impostor-btn">Pusheesapito</button>
-          <button class="impostor-btn">Pusheemapache</button>
-          <button class="impostor-btn">Pusheehada</button>
-          <button class="impostor-btn">Pusheeardilla</button>
-          <button class="impostor-btn">Pusheebuho</button>
-        </div>
-        <button id="btnRegresar" style="margin-top:12px; padding:12px 32px; border:none; border-radius:12px; background:#ff69b4; color:#fff; font-size:1.1em; cursor:pointer;">Regresar</button>
-      <div id="chocolatReveal" style="display:none; position:relative; height:180px; margin-top:24px;">
-        <img id="chocolatImg" src="chocolat.png" alt="chocolate" style="position:absolute; left:-320px; top:0; width:180px; height:auto; border-radius:16px; box-shadow:0 4px 24px #e75480; transition:left 1.5s cubic-bezier(.68,-0.55,.27,1.55);" />
       </div>
     </div>
-    </div>
-   </div>
-  <script>
+  </div>
+</div>
+<script>
 
-      // Heart particles animation
-      const canvas = document.getElementById('heartParticles');
-      const ctx = canvas.getContext('2d');
-      let hearts = [];
-      function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      }
-      window.addEventListener('resize', resizeCanvas);
-      resizeCanvas();
-      function randomHeart() {
-        return {
-          x: Math.random() * canvas.width,
-          y: canvas.height + Math.random() * 100,
-          size: 16 + Math.random() * 24,
-          speed: 1 + Math.random() * 2,
-          drift: (Math.random() - 0.5) * 1.5,
-          alpha: 0.7 + Math.random() * 0.3,
-          color: ['#ff69b4', '#d6336c', '#fff0f6'][Math.floor(Math.random()*3)]
-        };
-      }
-      for(let i=0;i<60;i++) hearts.push(randomHeart());
-      function drawHeart(h) {
-        ctx.save();
-        ctx.globalAlpha = h.alpha;
-        ctx.translate(h.x, h.y);
-        ctx.rotate(Math.sin(h.y/40)*0.2);
-        ctx.beginPath();
-        ctx.moveTo(0, h.size/4);
-        ctx.bezierCurveTo(h.size/2, -h.size/2, h.size, h.size/3, 0, h.size);
-        ctx.bezierCurveTo(-h.size, h.size/3, -h.size/2, -h.size/2, 0, h.size/4);
-        ctx.fillStyle = h.color;
-        ctx.fill();
-        ctx.restore();
-      }
-      function animateHearts() {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        for(let h of hearts) {
-          h.y -= h.speed;
-          h.x += h.drift;
-          if(h.y < -40 || h.x < -40 || h.x > canvas.width+40) {
-            Object.assign(h, randomHeart());
-            h.y = canvas.height + 20;
-          }
-          drawHeart(h);
-        }
-        requestAnimationFrame(animateHearts);
-      }
-      animateHearts();
 
-      // Heart click: show GIF, then dialogs and table
-      const mainHeart = document.getElementById('mainHeart');
-      const videoModal = document.getElementById('videoModal');
-      const pusheenGif = document.getElementById('pusheenGif');
-      const dialog1 = document.getElementById('dialog1');
-      const dialog2 = document.getElementById('dialog2');
-      const tablaPersonajes = document.getElementById('tablaPersonajes');
-      const dialogoPersonaje = document.getElementById('dialogoPersonaje');
-      const btnElegirImpostor = document.getElementById('btnElegirImpostor');
-      const impostorOpciones = document.getElementById('impostorOpciones');
-      mainHeart.addEventListener('click', () => {
-        mainHeart.style.display = 'none';
-        videoModal.style.display = 'flex';
-        pusheenGif.style.display = 'block';
-        pusheenGif.style.opacity = 1;
+
+// Efecto máquina de escribir para la carta principal (más lento y corazones grandes debajo)
+const mainLetterText = `Han pasado ya 365 días desde que esta hermosa historia juntos comenzó, 12 largos meses en los que han ocurrido de todo, desde felicidad, tristeza, ciertas peleas pequeñas, pero apesar de que han habido momentos dificiles, todo lo hemos sabido sobrellevar.\nCada momento junto a ti, por más que sean 2 minutos hablando, me hace sentir la persona mas feliz del mundo, y es que no hay nada mas bonito que escucharte reir, escuchar tu voz, sentir tu cariño sincero, cada dia a tu lado es un regalo que aprecio con todo mi corazon.\n\nContigo he aprendido muchas cosas, a ser mejor persona, a valorar cada instante, a amar sin condiciones, a ser paciente y comprensivo. Eres mi compañera de vida, mi persona de confianza, mi mejor amiga, mi preciosa novia que no cambiaré por nadie en la vida. Gracias por ser como eres, por tu ternura, tu dulzura, tu inteligencia y tu belleza que me deja plenamente enamorado por cada segundo que veo tu carita bella, no sabes lo mucho que me encanta ver tu delicada piel, tus ojitos perfectos, tu cabello, y cada detalle de ti que me hace amarte mas y mas.\n\nContigo mi vida es diferente, más llena de amor, alegría y felicidad. Gracias por hacerme sentir tan especial cada día, me encantas por todo lo que haces por mi.\n\nTe amo mxoo. ♡`;
+const mainLetterDiv = document.getElementById('mainLetter');
+const heartsContainer = document.getElementById('heartsContainer');
+let mainLetterIdx = 0;
+function typeMainLetter() {
+  if (mainLetterIdx < mainLetterText.length) {
+    const char = mainLetterText.charAt(mainLetterIdx);
+    if (char === '\n') {
+      mainLetterDiv.innerHTML += '<br>';
+    } else {
+      mainLetterDiv.innerHTML += char;
+    }
+    mainLetterIdx++;
+    setTimeout(typeMainLetter, 48); // Más lento
+  } else {
+    // Cuando termina, mostrar corazones grandes debajo
+    setTimeout(() => fillHeartsBelow(), 600);
+  }
+}
+function fillHeartsBelow() {
+  const heartCount = 18;
+  let i = 0;
+  function addHeart() {
+    if (i < heartCount) {
+      const heart = document.createElement('img');
+      heart.src = 'https://img.emojitty.art/emojitty/assets/2025/09/cat-with-heart_hd.png';
+      heart.alt = 'corazón';
+      heart.style.position = 'absolute';
+      heart.style.width = (Math.random() * 40 + 50) + 'px';
+      heart.style.left = (Math.random() * 80) + '%';
+      heart.style.top = (Math.random() * 30) + 'px';
+      heart.style.transform = `rotate(${Math.random()*60-30}deg)`;
+      heart.style.opacity = 0.92;
+      heartsContainer.appendChild(heart);
+      i++;
+      setTimeout(addHeart, 120);
+    }
+  }
+  addHeart();
+}
+if (mainLetterDiv) typeMainLetter();
+
+// Sorpresa con cuenta regresiva
+const surpriseBtn = document.getElementById('surpriseBtn');
+const surpriseMsg = document.getElementById('surpriseMsg');
+let surpriseTimer = null;
+if (surpriseBtn && surpriseMsg) {
+  surpriseBtn.addEventListener('click', function() {
+    if (surpriseTimer) return; // Evita múltiples timers
+    let seconds = 60;
+    surpriseMsg.style.display = 'block';
+    surpriseMsg.textContent = `🎁 Sorpresa en ${seconds} segundos...`;
+    surpriseBtn.disabled = true;
+    surpriseBtn.style.opacity = '0.7';
+    surpriseTimer = setInterval(() => {
+      seconds--;
+      if (seconds > 0) {
+        surpriseMsg.textContent = `🎁 Sorpresa en ${seconds} segundos...`;
+      } else {
+        clearInterval(surpriseTimer);
+        surpriseTimer = null;
+        surpriseMsg.textContent = 'Vamos a adoptme, tengo algo para ti :3';
+        setTimeout(() => {
+          surpriseMsg.style.display = 'none';
+          surpriseBtn.disabled = false;
+          surpriseBtn.style.opacity = '1';
+        }, 10000);
+      }
+    }, 1000);
+  });
+}
+
+  // Mostrar/ocultar playlist romántica
+  const showPlaylistBtn = document.getElementById('showPlaylistBtn');
+  const playlistEmbed = document.getElementById('playlistEmbed');
+  if (showPlaylistBtn && playlistEmbed) {
+    showPlaylistBtn.addEventListener('click', function() {
+      if (playlistEmbed.style.display === 'none') {
+        playlistEmbed.style.display = 'block';
+        showPlaylistBtn.textContent = '✖ Cerrar playlist';
+      } else {
+        playlistEmbed.style.display = 'none';
+        showPlaylistBtn.textContent = '🎵 Playlist romántica';
+      }
+    });
+  }
+  
+  function crearCorazones() {
+    const heartsContainer = document.querySelector('.hearts');
+    setInterval(() => {
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+      heart.textContent = '❤';
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+      heart.style.animationDuration = (Math.random() * 5 + 5) + 's';
+      heartsContainer.appendChild(heart);
+      setTimeout(() => { heart.remove(); }, 8000);
+    }, 500);
+  }
+  crearCorazones();
+  const correctPassword = '0202';
+  let input = '';
+  function enterDigit(digit) {
+    if (input.length < 4) {
+      input += digit;
+      updateDisplay();
+    }
+  }
+  function deleteLast() {
+    input = input.slice(0, -1);
+    updateDisplay();
+  }
+  function updateDisplay() {
+    document.getElementById('inputDisplay').textContent = input.padEnd(4, '•');
+  }
+  function checkPassword() {
+    if (input.length === 4) {
+      if (input === correctPassword) {
+        document.getElementById('passwordScreen').classList.remove('active');
+        document.getElementById('notepadScreen').classList.add('active');
+      } else {
+        alert('Contraseña incorrecta, intenta de nuevo');
+        input = '';
+        updateDisplay();
+      }
+    } else {
+      alert('Debes ingresar los 4 dígitos.');
+    }
+  }
+  function goBack() {
+    document.getElementById('notepadScreen').classList.remove('active');
+    document.getElementById('passwordScreen').classList.add('active');
+    input = '';
+    updateDisplay();
+  }
+</script>
+</body>
+<!-- Carta interactiva en la esquina inferior derecha -->
+</body>
+</html>
